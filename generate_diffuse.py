@@ -254,7 +254,7 @@ lpips_model = lpips.LPIPS(net='vgg').to(device)
 
 
 ### Actually do the run...
-def do_run():
+def do_run(args, prompts):
     if args.seed is None:
         seed = torch.seed()
     else:
@@ -265,7 +265,8 @@ def do_run():
     loss_test = []
 
     make_cutouts = MakeCutouts(clip_size, cutn, cut_pow)
-    side_x = side_y = model_config['image_size']
+    side_x = 256
+    side_y = 256
 
     target_embeds, weights = [], []
 
@@ -389,72 +390,7 @@ def do_run():
             # Countdown
             cur_t -= 1
 
-        # Video generation
-        if args.make_video:
-            init_frame = 1      # Initial video frame
-            last_frame = j      # This will raise an error if that number of frames does not exist.
-
-            length = 5          # Desired time of the video in seconds
-
-            min_fps = 10
-            max_fps = 60
-            
-            total_frames = last_frame-init_frame
-            
-            if args.upscale_video:
-                if not os.path.exists('upscaled_steps'):
-                    os.mkdir('upscaled_steps')
-                try:
-                    run("./realesrgan-ncnn-vulkan -i steps -o upscaled_steps", check=True, shell=True)
-                except FileNotFoundError:
-                    print("realesrgan-ncnn-vulkan not found")
-                    args.upscale_video = False
-
-            frames = []
-            tqdm.write('Generating video...')
-            for k in range(init_frame,last_frame):
-                if args.upscale_video:
-                    temp = Image.open("./upscaled_steps/"+ str(k) +'.png')
-                else:
-                    temp = Image.open("./steps/"+ str(k) +'.png')
-                keep = temp.copy()
-                frames.append(keep)
-                temp.close()
-            
-            fps = np.clip(total_frames/length,min_fps,max_fps)
-
-            # Batches
-            if i > 0:
-                m_filename = (os.path.basename(args.output).split('.')[0])
-                m_filename = m_filename + '-' + str(i) + '.png'
-                m_filename = os.path.join(os.path.dirname(args.output), m_filename)
-            else:
-                m_filename = args.output
-
-            output_file = re.compile('\.png$').sub('.mp4', m_filename)
-            
-            try:
-                p = Popen(['ffmpeg',
-                           '-y',
-                           '-f', 'image2pipe',
-                           '-vcodec', 'png',
-                           '-r', str(fps),
-                           '-i',
-                           '-',
-                           '-vcodec', 'libx264',
-                           '-r', str(fps),
-                           '-pix_fmt', 'yuv420p',
-                           '-crf', '17',
-                           '-preset', 'veryslow',
-                           output_file], stdin=PIPE)
-            except FileNotFoundError:
-                print("ffmpeg command failed - check your installation")        
-            for im in tqdm(frames):
-                im.save(p.stdin, 'PNG')
-            p.stdin.close()
-            p.wait()
-
 # Run   
 if __name__ == "__main__":
     gc.collect()
-    do_run()         
+    do_run(args, prompts)         
