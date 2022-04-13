@@ -8,18 +8,18 @@ logging.basicConfig(level=logging.INFO)
 
 BUCKET_NAME=""
 BUCKET_REGION=""
-AWS_SECRET_KEY_ID=""
-AWS_SECREY_ACCESS_KEY=""
+AWS_ACCESS_KEY_ID=""
+AWS_SECRET_ACCESS_KEY=""
 QUEUE_NAME=""
 
 s3 = boto3.client('s3',
-                    aws_access_key_id=AWS_SECRET_KEY_ID,
-                    aws_secret_access_key=AWS_SECREY_ACCESS_KEY,
+                    aws_access_key_id=AWS_ACCESS_KEY_ID,
+                    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
                     region_name=BUCKET_REGION,
 )
 sqs = boto3.resource('sqs',
-                     aws_access_key_id=AWS_SECRET_KEY_ID,
-                     aws_secret_access_key=AWS_SECREY_ACCESS_KEY,
+                     aws_access_key_id=AWS_ACCESS_KEY_ID,
+                     aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
                      region_name=BUCKET_REGION,
 )
 queue = sqs.get_queue_by_name(QueueName=QUEUE_NAME)
@@ -34,8 +34,8 @@ def process_message():
     for message in queue.receive_messages(MaxNumberOfMessages=1):
         try:
             print(message.body)
-            body = json.loads(message.body)
-            prompt = body["prompt"]
+            data = json.loads(message.body)
+            prompt = data["prompt"]
             logging.info(f"starting job with prompt: {prompt}")
             store_status(data, "processing")
 
