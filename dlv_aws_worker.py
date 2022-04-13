@@ -42,7 +42,7 @@ def process_message():
             from generate_diffuse import args, do_run
             do_run(args, [prompt])
 
-            store_results(body, "./output.png")
+            store_results(data, "./output.png")
 
             message.delete()
         except Exception as e:
