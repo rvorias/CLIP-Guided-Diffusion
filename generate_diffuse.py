@@ -92,7 +92,7 @@ vq_parser.add_argument("-cgs",  "--clip_scale", type=int, help="CLIP guidance sc
 vq_parser.add_argument("-tvs",  "--tv_scale", type=float, help="Smoothness scale", default=150, dest='tv_scale') # Controls the smoothness of the final output.
 vq_parser.add_argument("-rgs",  "--range_scale", type=int, help="RGB range scale", default=50, dest='range_scale') # Controls how far out of range RGB values are allowed to be.
 
-vq_parser.add_argument("-os",   "--output_size", type=int, help="Output image size (256 or 512)", default=256, dest='image_size')
+vq_parser.add_argument("-os",   "--output_size", type=int, help="Output image size (256 or 512)", default=512, dest='image_size')
 vq_parser.add_argument("-s",    "--seed", type=int, help="Seed", default=None, dest='seed')
 vq_parser.add_argument("-o",    "--output", type=str, help="Output file", default="output.png", dest='output')
 
